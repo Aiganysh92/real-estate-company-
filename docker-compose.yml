@@ -1,0 +1,20 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    image: real-estate-company-backend:local
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    image: real-estate-company-frontend:local
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
