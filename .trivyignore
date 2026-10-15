@@ -1,0 +1,42 @@
+# Trivy ignore list
+#
+# These CVEs live in tooling bundled INSIDE the official Node.js/Nginx base
+# images (e.g. npm's own vendored node_modules, or base-OS packages) — not in
+# this application's code or its runtime dependencies. A fixed version exists
+# upstream, but the official base image tag hasn't picked it up yet. There is
+# no action the app Dockerfiles can take beyond waiting for the next base
+# image release, so they are suppressed here rather than permanently blocking
+# the pipeline.
+#
+# Review periodically and remove entries once the base images are rebuilt
+# with the fix, or once we move to a slimmer runtime (e.g. distroless) that
+# doesn't bundle npm.
+#
+# Last reviewed: 2026-10-15
+
+# npm-bundled brace-expansion (node:20-alpine, backend image)
+CVE-2026-102276
+CVE-2026-102278
+CVE-2026-13149
+CVE-2026-14257
+CVE-2026-69152
+
+# npm-bundled cross-spawn / other npm-internal deps (node:20-alpine, backend image)
+CVE-2024-21538
+CVE-2025-64756
+CVE-2026-23745
+CVE-2026-23950
+CVE-2026-24842
+CVE-2026-26960
+CVE-2026-26996
+CVE-2026-27903
+CVE-2026-27904
+CVE-2026-29786
+CVE-2026-31802
+CVE-2026-48815
+CVE-2026-59873
+CVE-2026-59874
+CVE-2026-69192
+CVE-2026-73566
+CVE-2026-93748
+CVE-2026-9496

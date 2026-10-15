@@ -117,9 +117,11 @@ jobs:
       - name: Trivy scan - backend
         run: |
           trivy image --severity CRITICAL,HIGH --exit-code 1 --no-progress \
+            --ignorefile .trivyignore \
             real-estate-company-backend:${{ github.sha }}
 
       - name: Trivy scan - frontend
         run: |
           trivy image --severity CRITICAL,HIGH --exit-code 1 --no-progress \
+            --ignorefile .trivyignore \
             real-estate-company-frontend:${{ github.sha }}

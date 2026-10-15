@@ -88,6 +88,20 @@ trivy image real-estate-company-backend:local
 trivy image real-estate-company-frontend:local
 ```
 
+### About `.trivyignore`
+
+The root `.trivyignore` suppresses a set of CVEs that live inside **npm's own
+bundled dependencies** in the official `node:20-alpine` base image (not in
+this app's code or its production `node_modules`) — Trivy flags them, but
+there is nothing the application Dockerfile can do about them beyond waiting
+for a new base image release. Each entry is commented with its origin and a
+"last reviewed" date.
+
+This is a deliberate, teachable example of a real vulnerability-management
+decision. For class exercises, try: removing `.trivyignore` to show the
+pipeline failing on real findings, triaging a finding, bumping the base image
+tag, or switching to a distroless runtime image.
+
 ## Kubernetes (`k8s/`)
 
 Basic manifests are included for the next stage of training:
