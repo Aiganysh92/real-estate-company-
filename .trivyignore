@@ -40,3 +40,8 @@ CVE-2026-69192
 CVE-2026-73566
 CVE-2026-93748
 CVE-2026-9496
+
+# Alpine OS packages libcrypto3/libssl3 (openssl) — node:20-alpine base layer
+# hasn't picked up the patched package build yet
+CVE-2026-14456
+CVE-2026-45447
