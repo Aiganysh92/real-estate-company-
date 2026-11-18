@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-allow-alb
+  namespace: real-estate-company
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 172.31.55.249/32
+        - ipBlock:
+            cidr: 172.31.85.61/32
+        - ipBlock:
+            cidr: 172.31.3.221/32
+        - ipBlock:
+            cidr: 172.31.30.198/32
+        - ipBlock:
+            cidr: 172.31.65.241/32
+        - ipBlock:
+            cidr: 172.31.44.131/32
+      ports:
+        - protocol: TCP
+          port: 4000
