@@ -1,43 +1,69 @@
 const express = require("express");
-const properties = require("../data/properties");
+const pool = require("../db");
 
 const router = express.Router();
 
-router.get("/cities", (req, res) => {
-  const cities = [...new Set(properties.map((p) => p.city))].sort();
-  res.json(cities);
+router.get("/cities", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT DISTINCT city FROM properties ORDER BY city"
+    );
+    res.json(result.rows.map(row => row.city));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database error" });
+  }
 });
 
-router.get("/", (req, res) => {
-  const { city, minPrice, maxPrice, bedrooms, type } = req.query;
+router.get("/", async (req, res) => {
+  try {
+    const { city, minPrice, maxPrice, bedrooms, type } = req.query;
+    const conditions = [];
+    const values = [];
 
-  let results = properties;
+    function addCondition(sql, value) {
+      values.push(value);
+      conditions.push(sql.replace("?", "$" + values.length));
+    }
 
-  if (city) {
-    results = results.filter((p) => p.city.toLowerCase() === String(city).toLowerCase());
-  }
-  if (minPrice) {
-    results = results.filter((p) => p.price >= Number(minPrice));
-  }
-  if (maxPrice) {
-    results = results.filter((p) => p.price <= Number(maxPrice));
-  }
-  if (bedrooms) {
-    results = results.filter((p) => p.bedrooms >= Number(bedrooms));
-  }
-  if (type) {
-    results = results.filter((p) => p.type.toLowerCase() === String(type).toLowerCase());
-  }
+    if (city) addCondition("LOWER(city) = LOWER(?)", city);
+    if (minPrice) addCondition("price >= ?::integer", minPrice);
+    if (maxPrice) addCondition("price <= ?::integer", maxPrice);
+    if (bedrooms) addCondition("bedrooms >= ?::integer", bedrooms);
+    if (type) addCondition("LOWER(type) = LOWER(?)", type);
 
-  res.json(results);
+    const where = conditions.length
+      ? " WHERE " + conditions.join(" AND ")
+      : "";
+
+    const result = await pool.query(
+      "SELECT * FROM properties" + where + " ORDER BY id",
+      values
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database error" });
+  }
 });
 
-router.get("/:id", (req, res) => {
-  const property = properties.find((p) => p.id === Number(req.params.id));
-  if (!property) {
-    return res.status(404).json({ error: "Property not found" });
+router.get("/:id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM properties WHERE id = $1",
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Property not found" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database error" });
   }
-  res.json(property);
 });
 
 module.exports = router;
